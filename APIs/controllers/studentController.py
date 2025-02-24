@@ -72,3 +72,49 @@ def fetchAllStudentsFromDatabase():
         return {"success": True, "data": students}
     else:
         return {"success": False, "data": "No students found."}
+
+# function to fetch a single student from database on the basis of id
+
+
+def fetchSingleStudentFromDatabase(id):
+    sql = "SELECT *FROM students WHERE ID = %s "
+    params = (id,)
+    students = execute_query(sql, params, fetch=True)
+
+    if students:
+        return {"success": True, "data": students[0]}
+    else:
+        return {"success": False, "data": "Student not found."}
+
+
+# function to update a student in database
+def updateStudentHandler(id, updatedData):
+
+    if not updatedData:
+        return {"success": False, "message": "No fields updated."}
+
+    # Dynamically create the SET clause for only the fields that need updating
+    setClause = ", ".join([f"{key} = %s" for key in updatedData.keys()])
+
+    # Prepare values for query execution
+    values = list(updatedData.values()) + [id]  # Add ID to the values list
+
+    sql = f"UPDATE students SET {setClause} WHERE ID = %s"
+
+    success = execute_query(sql, tuple(values))
+
+    if success:
+        return {"success": True, "message": "Student updated successfully."}
+    else:
+        return {"success": False, "message": "Failed to update student."}
+
+
+# function to delete a student on the basis of id
+def deleteStudentFromDB(id):
+    sql = "DELETE FROM students WHERE id = %s"
+    params = (id,)
+    success = execute_query(sql, params)
+    if success:
+        return {"success": True, "message": "Student deleted successfully."}
+    else:
+        return {"success": False, "message": "Failed to delete student."}
